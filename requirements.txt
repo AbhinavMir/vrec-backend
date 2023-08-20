@@ -1,0 +1,11 @@
+Django
+djangorestframework
+django-cors-headers
+PyMySQL
+dj_database_url
+python-dotenv
+djangorestframework-simplejwt==5.2.2
+openai
+urllib3>=2.0.0a1
+django_psdb_engine
+gunicorn

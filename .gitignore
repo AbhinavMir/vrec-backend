@@ -1,0 +1,38 @@
+.env
+my_env
+*.pyc
+*.pyo
+__pycache__/
+# Ignore IDE-specific files
+*.iml
+*.ipr
+*.iws
+
+# Ignore compiled files
+*.class
+*.jar
+*.war
+
+# Ignore database files
+*.db
+*.sqlite
+*.db-journal
+
+# Ignore logs and temporary files
+*.log
+*.tmp
+*.swp
+
+# Ignore user-specific settings
+.vscode/
+.idea/
+
+# Ignore environment-specific files
+*.env
+
+# Ignore generated documentation
+docs/
+
+# Ignore build artifacts
+build/
+dist/

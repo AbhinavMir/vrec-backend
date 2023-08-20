@@ -1,0 +1,17 @@
+{
+  "id": "chatcmpl-7oBflzGjE5YFfuMw78dJzO9dByiWb",
+  "object": "chat.completion",
+  "created": 1692195625,
+  "model": "gpt-3.5-turbo-0613",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "The text is about me feeling good and going on a fishing trip with my friends. I mention having an app idea for an open source file over app similar to obsidian but with better file definitions. I also mention being close to finishing my work on ThoughtForest, including DevOps and OpenAI."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": { "prompt_tokens": 95, "completion_tokens": 60, "total_tokens": 155 }
+}
