@@ -18,6 +18,7 @@ from rest_framework.permissions import IsAuthenticated
 from .serializers import UserSerializer, SummarySerializer, ChangePasswordSerializer
 import openai
 import math
+from django.shortcuts import get_object_or_404
 
 from .models import Transcription, User, Summary
 from .serializers import (
@@ -278,3 +279,33 @@ class ChangePasswordView(APIView):
             return Response({'message': 'Password changed successfully.'}, status=status.HTTP_200_OK)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+from django.core.mail import EmailMessage
+
+class ExportUserDataView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        user_data = {
+            'user_details': UserSerializer(user).data,
+            'transcriptions': TranscriptionSerializer(Transcription.objects.filter(user=user), many=True).data,
+            'summaries': SummarySerializer(Summary.objects.filter(user=user), many=True).data,
+        }
+        
+        # Create a JSON file containing the user's data
+        import json
+        user_data_json = json.dumps(user_data, indent=4)
+        
+        # Send the email
+        subject = 'Your Data Export'
+        message = 'Please find attached your requested data export.'
+        from_email = 'your@email.com'
+        recipient_list = [user.email]
+
+        email = EmailMessage(subject, message, from_email, recipient_list)
+        email.attach('user_data.json', user_data_json, 'application/json')
+        email.send()
+
+        return Response({'message': 'Data export requested. You will receive an email shortly.'}, status=status.HTTP_200_OK)

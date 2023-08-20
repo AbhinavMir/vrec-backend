@@ -18,7 +18,8 @@ from .views import (
     AllSummariesRetrieveView,
     check_code,
     ChangePasswordView,
-    hello_world
+    hello_world,
+    ExportUserDataView
 )
 
 urlpatterns = [
@@ -31,6 +32,7 @@ urlpatterns = [
     # path('fetch-all/', FetchAllTranscriptions.as_view(), name='fetch_all_transcriptions'),
     path('user-details/', UserDetailsView.as_view(), name='user_details'),
     path('change-password/', ChangePasswordView.as_view(), name='change_password'),
+     path('export-data/', ExportUserDataView.as_view(), name='export_data'),
     path('user-profile/update/', UserProfileUpdateView.as_view(), name='user_profile_update'),
     path('user-profile/delete/', UserProfileDeleteView.as_view(), name='user_profile_delete'),
     path('transcription/<int:pk>/update/', TranscriptionUpdateView.as_view(), name='transcription_update'),
