@@ -111,7 +111,6 @@ DATABASES = {
         'OPTIONS': {
             'ssl': {
                 'ca': os.environ.get('MYSQL_ATTR_SSL_CA'),
-                
                 }
         }
   }
