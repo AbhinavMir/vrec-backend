@@ -18,6 +18,7 @@ from rest_framework.permissions import IsAuthenticated
 from .serializers import UserSerializer, SummarySerializer, ChangePasswordSerializer
 import openai
 import math
+from django.urls import reverse
 from django.shortcuts import get_object_or_404
 
 from .models import Transcription, User, Summary
@@ -35,10 +36,13 @@ class UserSignupView(APIView):
             email = serializer.validated_data['email']
             name = serializer.validated_data['name']
             password = serializer.validated_data['password']
-
+            
             user = User.objects.create_user(email=email, name=name, password=password)
+            user.generate_verification_code()  # Generate and set verification code
+
             subject = 'Welcome to ThoughtForest'
-            message = f'You are about to embark on a journey, your life will never be the same. You chose to trust me, and I shall make it worth it for you. I am putting every particle in my body, every ounce of my energy, every bit of my soul into making this a meaningful experience for you. Thank you, {name} for trusting me. I will not let you down.\n\nReply to this email for feedback or a FREE voucher for one month to use this application.'
+            verification_link = reverse('email_verification') + f'?code={user.verification_code}'
+            message = f'You are about to embark on a journey, your life will never be the same. You chose to trust me, and I shall make it worth it for you. I am putting every particle in my body, every ounce of my energy, every bit of my soul into making this a meaningful experience for you. Thank you, {name} for trusting me. I will not let you down.\n\nReply to this email for feedback or a FREE voucher for one month to use this application.\n\nYou can verify your email by clicking on the following link:\n\n{verification_link}'
             from_email = 'atg271@gmail.com'
             recipient_list = [email]
             send_mail(subject, message, from_email, recipient_list)
@@ -49,6 +53,10 @@ class UserSignupView(APIView):
             from_email = "atg271@gmail.com"
             recipient_list = [from_email]
             send_mail(subject, message, from_email, recipient_list)
+
+            # Send the email with the verification link
+            send_mail(subject, message, from_email, recipient_list)
+
             return Response({'message': 'User created successfully'}, 
                             status=status.HTTP_201_CREATED)
         
@@ -309,3 +317,47 @@ class ExportUserDataView(APIView):
         email.send()
 
         return Response({'message': 'Data export requested. You will receive an email shortly.'}, status=status.HTTP_200_OK)
+    
+
+class EmailVerificationView(APIView):
+    def get(self, request):
+
+        verification_code = request.query_params.get('code')
+        try:
+            user = User.objects.get(verification_code=verification_code)
+        except User.DoesNotExist:
+            return Response({'message': 'Invalid verification code.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        if user.is_email_verified:
+            return Response({'message': 'Email is already verified.'}, status=status.HTTP_200_OK)
+        
+        if user.verification_attempts >= 3:
+            user.generate_verification_code()  # Generate a new verification code
+            user.verification_attempts = 0  # Reset the verification attempts counter
+            user.save()
+            return Response({'message': 'Verification code expired. A new code has been sent to your email.'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        # Update verification attempts counter
+        user.is_email_verified = True
+        user.verification_attempts += 1
+        user.save()
+        return Response({'message': 'Email verified successfully.'}, status=status.HTTP_200_OK)
+
+class GenerateNewVerificationCodeView(APIView):
+    def get(self, request):
+        user = request.user  # The authenticated user
+        
+        # Generate a new verification code for the user
+        user.generate_verification_code()
+        user.save()
+        
+        # Send an email to the user with the new verification code
+        subject = 'New Verification Code'
+        verification_link = reverse('email_verification') + f'?code={user.verification_code}'
+        verification_url = request.build_absolute_uri(verification_link)
+        message = f'Your new verification code is: {user.verification_code}<br><br>You can verify your email by clicking on the following link:<br><br><a href="{verification_url}">{verification_url}</a>'
+        from_email = 'atg271@gmail.com'
+        recipient_list = [user.email]
+        send_mail(subject, '', from_email, recipient_list, html_message=message)
+        
+        return Response({'message': 'New verification code generated and sent to your email.'}, status=status.HTTP_200_OK)

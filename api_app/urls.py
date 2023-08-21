@@ -19,7 +19,9 @@ from .views import (
     check_code,
     ChangePasswordView,
     hello_world,
-    ExportUserDataView
+    ExportUserDataView,
+    EmailVerificationView,
+    GenerateNewVerificationCodeView
 )
 
 urlpatterns = [
@@ -32,15 +34,18 @@ urlpatterns = [
     # path('fetch-all/', FetchAllTranscriptions.as_view(), name='fetch_all_transcriptions'),
     path('user-details/', UserDetailsView.as_view(), name='user_details'),
     path('change-password/', ChangePasswordView.as_view(), name='change_password'),
-     path('export-data/', ExportUserDataView.as_view(), name='export_data'),
+    path('export-data/', ExportUserDataView.as_view(), name='export_data'),
     path('user-profile/update/', UserProfileUpdateView.as_view(), name='user_profile_update'),
     path('user-profile/delete/', UserProfileDeleteView.as_view(), name='user_profile_delete'),
     path('transcription/<int:pk>/update/', TranscriptionUpdateView.as_view(), name='transcription_update'),
     path('transcription/<int:pk>/delete/', TranscriptionDeleteView.as_view(), name='transcription_delete'),
     path('add-summary/', SummaryCreateView.as_view(), name='add_summary'),
+    
     path('summary/<int:pk>/update/', SummaryUpdateView.as_view(), name='summary_update'),
     path('summary/<int:pk>/delete/', SummaryDeleteView.as_view(), name='summary_delete'),
     path('summary/<int:pk>/retrieve/', SummaryRetrieveView.as_view(), name='summary_retrieve'),
     path('all-summaries/', AllSummariesRetrieveView.as_view(), name='all_summaries'),
     path('check-code/', check_code, name='check_code'),
+    path('verify/', EmailVerificationView.as_view(), name='email_verification'),
+    path('generate-new-code/', GenerateNewVerificationCodeView.as_view(), name='generate_new_verification_code'),
 ]

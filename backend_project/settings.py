@@ -68,7 +68,6 @@ MIDDLEWARE = [
 ]
 
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
-CORS_ALLOWED_ORIGINS = ["*", "thoughtforest.xyz"]
 
 
 ROOT_URLCONF = "backend_project.urls"
@@ -110,7 +109,7 @@ DATABASES = {
         'PASSWORD': os.environ.get('DB_PASSWORD'),
         'OPTIONS': {
             'ssl': {
-                'ca': os.environ.get('MYSQL_ATTR_SSL_CA'),
+                'ca': os.environ.get('MYSQL_ATTR_SSL_CA_LOCAL_DEMO'),
                 }
         }
   }

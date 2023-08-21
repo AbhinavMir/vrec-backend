@@ -1,5 +1,7 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
+import random
+import string
 
 class UserManager(BaseUserManager):
     def create_user(self, email, name, password=None):
@@ -25,6 +27,9 @@ class User(AbstractBaseUser):
     is_staff = models.BooleanField(default=False)
     is_email_verified = models.BooleanField(default=False)
     is_subscription_active = models.BooleanField(default=False)
+    verification_code = models.CharField(max_length=16, null=True, blank=True)
+    verification_attempts = models.PositiveIntegerField(default=0)
+    
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
@@ -39,6 +44,16 @@ class User(AbstractBaseUser):
         
         self.set_password(new_password)
         self.save()
+    
+    def generate_verification_code(self):
+        code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+        self.verification_code = code
+        self.save()
+
+    def save(self, *args, **kwargs):
+        if not self.verification_code:
+            self.generate_verification_code()
+        super().save(*args, **kwargs)
 
 class Transcription(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
