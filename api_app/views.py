@@ -319,11 +319,11 @@ class ExportUserDataView(APIView):
     
 
 class EmailVerificationView(APIView):
-    def get(self, request):
-        verification_code = request.META.get('HTTP_X_VERIFICATION_CODE')
+    def post(self, request):
+        verification_code = request.data.get('verification_code')  # Get verification code from request body
         
         if not verification_code:
-            return Response({'message': 'Verification code is required in the headers.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'Verification code is required in the request body.'}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
             user = User.objects.get(verification_code=verification_code)
