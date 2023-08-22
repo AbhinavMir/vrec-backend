@@ -41,8 +41,7 @@ class UserSignupView(APIView):
             user.generate_verification_code()  # Generate and set verification code
 
             subject = 'Welcome to ThoughtForest'
-            verification_link = reverse('email_verification') + f'?code={user.verification_code}'
-            message = f'You are about to embark on a journey, your life will never be the same. You chose to trust me, and I shall make it worth it for you. I am putting every particle in my body, every ounce of my energy, every bit of my soul into making this a meaningful experience for you. Thank you, {name} for trusting me. I will not let you down.\n\nReply to this email for feedback or a FREE voucher for one month to use this application.\n\nYou can verify your email by clicking on the following link:\n\n{verification_link}'
+            message = f"""You are about to embark on a journey, your life will never be the same. You chose to trust me, and I shall make it worth it for you. I am putting every particle in my body, every ounce of my energy, every bit of my soul into making this a meaningful experience for you. Thank you, {name} for trusting me. I will not let you down.\n\nReply to this email for feedback or a free voucher for one month to use this application.\n\nYour verification code is {user.verification_code}.\n\n\n\nTrusting journey's call,\nSoul's energy binds us all,\nMeaning blooms, stands tall."""
             from_email = 'atg271@gmail.com'
             recipient_list = [email]
             send_mail(subject, message, from_email, recipient_list)
@@ -321,8 +320,11 @@ class ExportUserDataView(APIView):
 
 class EmailVerificationView(APIView):
     def get(self, request):
-
-        verification_code = request.query_params.get('code')
+        verification_code = request.META.get('HTTP_X_VERIFICATION_CODE')
+        
+        if not verification_code:
+            return Response({'message': 'Verification code is required in the headers.'}, status=status.HTTP_400_BAD_REQUEST)
+        
         try:
             user = User.objects.get(verification_code=verification_code)
         except User.DoesNotExist:
@@ -353,8 +355,7 @@ class GenerateNewVerificationCodeView(APIView):
         
         # Send an email to the user with the new verification code
         subject = 'New Verification Code'
-        verification_url = f'thoughtforest.xyz/verification?code={user.verification_code}'
-        message = f'Your new verification code is: {user.verification_code}<br><br>You can verify your email by clicking on the following link:<br><br><a href="{verification_url}">{verification_url}</a>'
+        message = f'Your new verification code is: {user.verification_code}'
         from_email = 'atg271@gmail.com'
         recipient_list = [user.email]
         send_mail(subject, '', from_email, recipient_list, html_message=message)
