@@ -353,8 +353,7 @@ class GenerateNewVerificationCodeView(APIView):
         
         # Send an email to the user with the new verification code
         subject = 'New Verification Code'
-        verification_link = 'thoughtforest.xyz/verify' + f'?code={user.verification_code}'
-        verification_url = request.build_absolute_uri(verification_link)
+        verification_url = f'thoughtforest.xyz/verification?code={user.verification_code}'
         message = f'Your new verification code is: {user.verification_code}<br><br>You can verify your email by clicking on the following link:<br><br><a href="{verification_url}">{verification_url}</a>'
         from_email = 'atg271@gmail.com'
         recipient_list = [user.email]
