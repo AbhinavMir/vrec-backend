@@ -48,6 +48,7 @@ JWT_AUTH = {
 
 # Celery Configuration
 CORS_ORIGIN_ALLOW_ALL=True
+CORS_ALLOWED_ORIGINS = ["https://thoughtforest.xyz"]
 CORS_ALLOW_CREDENTIALS=False
 SIMPLE_JWT = {
      'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
